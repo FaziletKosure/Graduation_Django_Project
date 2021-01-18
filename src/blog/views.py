@@ -1,7 +1,7 @@
 from rest_framework import generics
 from blog.models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
-from rest_framework.permissions import SAFE_METHODS, IsAuthenticatedOrReadOnly, BasePermission, IsAdminUser, DjangoModelPermissions
+from rest_framework.permissions import SAFE_METHODS, IsAuthenticatedOrReadOnly, IsAuthenticated, BasePermission, IsAdminUser, DjangoModelPermissions
 
 
 class PostUserWritePermission(BasePermission):
