@@ -1,5 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
+# from django.contrib.auth import get_user_model as user_model
+# User = user_model()
+from django.conf import settings
 
 
 def user_directory_path(instance, filename):
@@ -36,7 +38,7 @@ class Post(models.Model):
     slug = models.SlugField(max_length=250, unique_for_date='published')
     published = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='blog_posts')
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='blog_posts')
     status = models.CharField(
         max_length=10, choices=options, default='published')
     objects = models.Manager()  # default manager
@@ -62,7 +64,8 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     time_stamp = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
@@ -72,7 +75,8 @@ class Comment(models.Model):
 
 
 class Like(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -80,7 +84,8 @@ class Like(models.Model):
 
 
 class PostView(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     time_stamp = models.DateTimeField(auto_now_add=True)
 
