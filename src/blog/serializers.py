@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Post, Comment, Category
+from .models import Post, Comment, Category, Like, PostView
+from django.conf import settings
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -8,11 +9,25 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('name', 'id')
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source="user.username", read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ('content', 'post_id',
+                  'user',
+                  'time_stamp')
+
+
 class PostSerializer(serializers.ModelSerializer):
+    comments = CommentSerializer(many=True, read_only=True)
+    author = serializers.CharField(source="author.username", read_only=True)
+    category = serializers.CharField(source="category.name", read_only=True)
 
     class Meta:
         model = Post
         fields = (
+
             'id',
             'title',
             'author',
@@ -21,36 +36,44 @@ class PostSerializer(serializers.ModelSerializer):
             'image',
             'category',
             'status',
+            'comment_count',
+            'view_count',
+            'like_count',
+            'published',
+            'comments',
         )
 
 
-# class CategorySerializer(serializers.ModelSerializer):
-#     cats = PostSerializer(many=True, read_only=True)
+class LikeSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source="user.username", read_only=True)
 
-#     class Meta:
-#         model = Category
-#         fields = ('name', 'id', 'cats')
-
-
-class CommentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Comment
-        fields = ('content', 'post_id')
+        model = Like
+        fields = (
+            "user",
+            "post"
+        )
 
 
-# class PostDetailSerializer(serializers.ModelSerializer):
-#     content = CommentSerializer(many=True, read_only=True)
+class PostViewSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source="user.username", read_only=True)
 
-#     class Meta:
-#         model = Post
-#         fields = (
-#             'id',
-#             'title',
-#             'author',
-#             'excerpt',
-#             'content',
-#             'image',
-#             'category',
-#             'status',
-#             'content',
-#         )
+    class Meta:
+        model = PostView
+        fields = (
+            "user",
+            "post",
+            "time_stamp"
+        )
+
+
+class UserRegisterSerializer(serializers.ModelSerializer):
+
+    email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(min_length=8, write_only=True)
+
+    class Meta:
+        model = settings.AUTH_USER_MODEL
+        fields = ('email', 'username', 'first_name')
+        extra_kwargs = {'password': {'write_only': True}}

@@ -2,6 +2,7 @@ from django.db import models
 # from django.contrib.auth import get_user_model as user_model
 # User = user_model()
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 
 def user_directory_path(instance, filename):
@@ -34,7 +35,7 @@ class Post(models.Model):
     excerpt = models.TextField(null=True)
     content = models.TextField()
     image = models.ImageField(
-        upload_to=user_directory_path, default='django.jpg')
+        _("Image"), upload_to=user_directory_path, default='django.jpg')
     slug = models.SlugField(max_length=250, unique_for_date='published')
     published = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(
