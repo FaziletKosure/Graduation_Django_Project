@@ -142,6 +142,11 @@ MEDIA_ROOT = BASE_DIR / "media_root"
 REST_FRAMEWORK = {
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     # 'PAGE_SIZE': 1,
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser'
+    ),
 
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',

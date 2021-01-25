@@ -1,12 +1,12 @@
 
 from django.shortcuts import get_object_or_404
 from blog.models import Post
-from .serializers import PostSerializer, LikeSerializer, PostViewSerializer, CommentSerializer
+from .serializers import PostSerializer, LikeSerializer, PostViewSerializer, CommentSerializer, CommentCreateSerializer
 from rest_framework import viewsets, filters, generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 # Display Posts
 
 
@@ -46,7 +46,7 @@ class PostListDetailfilter(generics.ListAPIView):
 
 class CreatePost(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def post(self, request, format=None):
         print(request.data)
@@ -74,6 +74,26 @@ class DeletePost(generics.RetrieveDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = PostSerializer
     queryset = Post.objects.all()
+
+
+class CreateCommentAPI(APIView):
+    """
+    post:
+        Create a comment instnace. Returns created comment data
+        parameters: [slug, body]
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = CommentCreateSerializer
+    # permission_classes = [IsAuthenticated]
+
+    def post(self, request, slug):
+        post = get_object_or_404(Post, slug=slug)
+        serializer = CommentCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user, post=post)
+            return Response(serializer.data, status=200)
+        else:
+            return Response({"errors": serializer.errors}, status=400)
 
 
 """ Concrete View Classes

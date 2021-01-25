@@ -3,6 +3,27 @@ from .models import Post, Comment, Category, Like, PostView
 from django.conf import settings
 
 
+# class PostCreatSerializer(serializers.ModelSerializer):
+
+#     author = serializers.CharField(source="author.username", read_only=True)
+#     category = serializers.CharField(source="category.name", read_only=True)
+
+#     class Meta:
+#         model = Post
+#         fields = (
+
+
+#             'slug',
+#             'title',
+#             'author',
+#             'excerpt',
+#             'content',
+#             'image',
+#             'category',
+
+#         )
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -11,12 +32,20 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.CharField(source="user.username", read_only=True)
+    post = serializers.CharField(source="post.title", read_only=True)
 
     class Meta:
         model = Comment
         fields = ('content', 'post_id',
                   'user',
-                  'time_stamp')
+                  'time_stamp',
+                  'post')
+
+
+class CommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ("content",)
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -29,6 +58,7 @@ class PostSerializer(serializers.ModelSerializer):
         fields = (
 
             'id',
+            'slug',
             'title',
             'author',
             'excerpt',
